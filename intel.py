@@ -1,4 +1,6 @@
 import json
+from os import listdir
+from os.path import isfile, join
 
 __author__ = 'drzazga888'
 
@@ -6,19 +8,18 @@ from PIL import Image
 
 
 class Images:
-
     def __init__(self):
         self.items = []
+        self.path = None
 
-    def add(self, image):
-        pass
-
-    def remove(self, image_id):
-        pass
+    def select_dir(self, path):
+        for f in listdir(path):
+            if isfile(join(path, f)) and f.lower().endswith(('jpg', 'jpeg', 'png', 'bmp')):
+                self.items.append(Image.open(join(path, f)))
+        print(self.items)
 
 
 class Batcher:
-
     def __init__(self, images):
         self.images = images
         self.prop = {}
@@ -40,7 +41,6 @@ class Batcher:
 
 
 class Renamer(Batcher):
-
     def __init__(self, images):
         super().__init__(images)
         super().prop = {
@@ -52,7 +52,6 @@ class Renamer(Batcher):
 
 
 class Resizer(Batcher):
-
     def __init__(self, images):
         super().__init__(images)
         super().prop = {
