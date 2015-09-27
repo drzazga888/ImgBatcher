@@ -1,9 +1,8 @@
 import json
 import os
+from PIL import Image, ImageFilter
 
 __author__ = 'drzazga888'
-
-from PIL import Image
 
 
 class Images:
@@ -41,7 +40,6 @@ class Batcher:
 class Renamer(Batcher):
     def __init__(self, images):
         super().__init__(images)
-        self.prop['renamer1'] = 'renamer2'
 
     def perform(self):
         pass
@@ -50,9 +48,15 @@ class Renamer(Batcher):
 class Resizer(Batcher):
     def __init__(self, images):
         super().__init__(images)
+        self.prop['size'] = (256, 256)
+        self.prop['destination'] = '/home/mario/PycharmProjects/ImgBatcher/resized'
+        self.prop['quality'] = 90
+        self.prop['sharpen'] = True
 
     def perform(self):
         for image in self.images.items:
-            name = os.path.basename(image.filename)
+            name = os.path.splitext(os.path.basename(image.filename))[0]
+            if self.prop['sharpen']:
+                image = image.filter(ImageFilter.UnsharpMask(radius=2, percent=250, threshold=0))
             image.thumbnail(self.prop['size'])
-            image.save(os.path.join(self.prop['destination'], name), 'JPEG')
+            image.save(os.path.join(self.prop['destination'], name + '.jpg'), 'JPEG', quality=self.prop['quality'])
