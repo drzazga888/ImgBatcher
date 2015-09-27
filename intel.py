@@ -1,6 +1,5 @@
 import json
-from os import listdir
-from os.path import isfile, join
+import os
 
 __author__ = 'drzazga888'
 
@@ -13,10 +12,9 @@ class Images:
         self.path = None
 
     def select_dir(self, path):
-        for f in listdir(path):
-            if isfile(join(path, f)) and f.lower().endswith(('jpg', 'jpeg', 'png', 'bmp')):
-                self.items.append(Image.open(join(path, f)))
-        print(self.items)
+        for f in os.listdir(path):
+            if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(('jpg', 'jpeg', 'png', 'bmp')):
+                self.items.append(Image.open(os.path.join(path, f)))
 
 
 class Batcher:
@@ -43,9 +41,7 @@ class Batcher:
 class Renamer(Batcher):
     def __init__(self, images):
         super().__init__(images)
-        super().prop = {
-            'renamer1': 'renamer2'
-        }
+        self.prop['renamer1'] = 'renamer2'
 
     def perform(self):
         pass
@@ -54,9 +50,9 @@ class Renamer(Batcher):
 class Resizer(Batcher):
     def __init__(self, images):
         super().__init__(images)
-        super().prop = {
-            'batcher1': 'batcher2'
-        }
 
     def perform(self):
-        pass
+        for image in self.images.items:
+            name = os.path.basename(image.filename)
+            image.thumbnail(self.prop['size'])
+            image.save(os.path.join(self.prop['destination'], name), 'JPEG')
