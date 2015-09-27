@@ -16,6 +16,7 @@ class Images:
         self.path = ""
 
     def select_dir(self, path):
+        self.names = []
         self.path = path
         for f in os.listdir(path):
             if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(('jpg', 'jpeg', 'png', 'bmp')):
@@ -46,17 +47,17 @@ class Batcher(threading.Thread):
 
     def run(self):
         for img_name in self.images.names:
-            self.process_single(img_name)
+            self.process_single(img_name, self.processed)
             self.processed += 1
 
-    def process_single(self, img_name):
+    def process_single(self, img_name, img_nr):
         pass
 
     def processed_images(self):
         return self.processed
 
     def total_images(self):
-        return len(self.images.items)
+        return len(self.images.names)
 
 
 class Renamer(Batcher):
@@ -67,7 +68,6 @@ class Renamer(Batcher):
         super().__init__(images)
         self.transformation_schema = []
         self.transformation_schema_str = ""
-        self.prop['destination'] = '/home/mario/PycharmProjects/ImgBatcher/renamed'
         self.prop['text'] = 'obrazek_'
         self.prop['digits'] = 3
 
@@ -96,8 +96,9 @@ class Renamer(Batcher):
             self.transformation_schema_str += single_transformation['after']
             self.transformation_schema_str += '\n'
 
-    def process_single(self, img_name):
-        pass
+    def process_single(self, img_name, img_nr):
+        os.rename(os.path.join(self.images.path, self.transformation_schema[img_nr]['before']),
+                  os.path.join(self.images.path, self.transformation_schema[img_nr]['after']))
 
 
 class Resizer(Batcher):
@@ -111,8 +112,8 @@ class Resizer(Batcher):
         self.prop['quality'] = 90
         self.prop['sharpen'] = True
 
-    def process_single(self, img_name):
-        img = Image.open(os.path.join(img_name, self.images.path))
+    def process_single(self, img_name, img_nr):
+        img = Image.open(os.path.join(self.images.path, img_name))
         img_name_root = os.path.splitext(img_name)[0]
         if self.prop['sharpen']:
             img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=200, threshold=0))
