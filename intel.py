@@ -7,31 +7,25 @@ from PIL import Image, ImageFilter
 __author__ = 'drzazga888'
 
 
-class Images:
-    """ klasa operuje na zbiorze obrazków
+class Batcher(threading.Thread):
+    """ klasa bazowa dla modułów operujących na obrazkach
     """
 
+    extensions = ('jpg', 'jpeg', 'png', 'bmp')
+
     def __init__(self):
-        self.names = []
+        super().__init__()
         self.path = ""
+        self.names = []
+        self.prop = {}
+        self.processed = 0
 
     def select_dir(self, path):
         self.names = []
         self.path = path
         for f in os.listdir(path):
-            if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(('jpg', 'jpeg', 'png', 'bmp')):
+            if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(self.extensions):
                 self.names.append(f)
-
-
-class Batcher(threading.Thread):
-    """ klasa bazowa dla modułów operujących na obrazkach
-    """
-
-    def __init__(self, images):
-        super().__init__()
-        self.images = images
-        self.prop = {}
-        self.processed = 0
 
     def load_prop(self, path):
         file = open(path, "r")
@@ -46,7 +40,7 @@ class Batcher(threading.Thread):
         file.close()
 
     def run(self):
-        for img_name in self.images.names:
+        for img_name in self.names:
             self.process_single(img_name, self.processed)
             self.processed += 1
 
@@ -57,15 +51,15 @@ class Batcher(threading.Thread):
         return self.processed
 
     def total_images(self):
-        return len(self.images.names)
+        return len(self.names)
 
 
 class Renamer(Batcher):
     """ klasa, która zmienia nazwy obrazkom
     """
 
-    def __init__(self, images):
-        super().__init__(images)
+    def __init__(self):
+        super().__init__()
         self.transformation_schema = []
         self.transformation_schema_str = ""
         self.prop['text'] = 'obrazek_'
@@ -74,7 +68,7 @@ class Renamer(Batcher):
     def create_transformation_schema(self):
         self.transformation_schema = []
         counter = 0
-        for img_name in self.images.names:
+        for img_name in self.names:
             self.transformation_schema.append({
                 'before': img_name,
                 'after': self.prop['text'] + ("{0:0=" + str(self.prop['digits']) + "d}").format(
@@ -97,23 +91,23 @@ class Renamer(Batcher):
             self.transformation_schema_str += '\n'
 
     def process_single(self, img_name, img_nr):
-        os.rename(os.path.join(self.images.path, self.transformation_schema[img_nr]['before']),
-                  os.path.join(self.images.path, self.transformation_schema[img_nr]['after']))
+        os.rename(os.path.join(self.path, self.transformation_schema[img_nr]['before']),
+                  os.path.join(self.path, self.transformation_schema[img_nr]['after']))
 
 
 class Resizer(Batcher):
     """ klasa tworzy miniatury
     """
 
-    def __init__(self, images):
-        super().__init__(images)
+    def __init__(self):
+        super().__init__()
         self.prop['size'] = (256, 256)
         self.prop['destination'] = '/home/mario/PycharmProjects/ImgBatcher/resized'
         self.prop['quality'] = 90
         self.prop['sharpen'] = True
 
     def process_single(self, img_name, img_nr):
-        img = Image.open(os.path.join(self.images.path, img_name))
+        img = Image.open(os.path.join(self.path, img_name))
         img_name_root = os.path.splitext(img_name)[0]
         if self.prop['sharpen']:
             img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=200, threshold=0))

@@ -5,31 +5,26 @@ __author__ = 'drzazga888'
 
 if __name__ == '__main__':
 
-    # wybieranie folderu
-    i = Images()
-    i.select_dir("/media/mario/Dokumenty/Zdjęcia/Moje prace")
-
     # tworzenie miniatur
     print("---TWORZENIE MINIATUR---")
-    r = Resizer(i)
-    r.start()
-    while r.isAlive():
-        print("wykonano " + str(r.processed_images()) + " na " + str(r.total_images()))
+    batcher = Resizer()
+    batcher.select_dir("/media/mario/Dokumenty/Zdjęcia/Moje prace")
+    batcher.start()
+    while batcher.isAlive():
+        print("wykonano " + str(batcher.processed_images()) + " na " + str(batcher.total_images()))
         time.sleep(0.05)
-    r.join()
+    batcher.join()
     print("zakończono!")
-
-    # wybieranie folderu
-    i.select_dir("/home/mario/PycharmProjects/ImgBatcher/resized")
 
     # zmiana nazw
     print("---ZMIANA NAZW---")
-    r = Renamer(i)
-    r.create_transformation_schema()
-    print(r.transformation_schema_str)
-    r.start()
-    while r.isAlive():
-        print("wykonano " + str(r.processed_images()) + " na " + str(r.total_images()))
+    batcher = Renamer()
+    batcher.select_dir("/home/mario/PycharmProjects/ImgBatcher/resized")
+    batcher.create_transformation_schema()
+    print(batcher.transformation_schema_str)
+    batcher.start()
+    while batcher.isAlive():
+        print("wykonano " + str(batcher.processed_images()) + " na " + str(batcher.total_images()))
         time.sleep(0.05)
-    r.join()
+    batcher.join()
     print("zakończono!")
