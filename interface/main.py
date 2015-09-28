@@ -1,4 +1,4 @@
-from windows.HomeWindow import HomeWindow
+from interface.windows.HomeWindow import HomeWindow
 
 from PyQt4.QtGui import *
 
@@ -12,14 +12,13 @@ class Main(QMainWindow):
         self.setCentralWidget(self.windows_c)
 
         # ustawienia okna
-        #self.setWindowIcon(QIcon('app_ico.png'))  # ustawienie ikonki programu
+        # self.setWindowIcon(QIcon('app_ico.png'))  # ustawienie ikonki programu
         self.setWindowTitle('Window title <Kamil will change this>')  # ustawienie tytulu okna
         self.resize(800, 600)  # ustawienie domyslnego rozmiaru okna
         self.center()
 
     # wsparcie wysrodkowania okna
     def center(self):
-
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)

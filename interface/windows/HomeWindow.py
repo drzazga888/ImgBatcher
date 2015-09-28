@@ -1,5 +1,5 @@
-from windows.NameChangeWindow import NameChangeWindow
-from windows.CreateMiniatureWindow import CreateMiniatureWindow
+from interface.windows.NameChangeWindow import NameChangeWindow
+from interface.windows.CreateMiniatureWindow import CreateMiniatureWindow
 from PyQt4.QtGui import *
 
 

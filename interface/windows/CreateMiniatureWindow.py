@@ -179,7 +179,7 @@ class CreateMiniatureWindow(QWidget):
 
         is_sharpen = self.sharpen_rbut.isChecked()
 
-        from go_exec_fun import change_miniature_size
+        from interface.go_exec_fun import change_miniature_size
         if change_miniature_size(width, heigh, quality, self.folder_name, self.folder_dest_name, is_sharpen):
             QMessageBox.information(self, 'Done', 'Zrobione :-)')
             self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())

@@ -211,7 +211,7 @@ class NameChangeWindow(QWidget):
             self.main.statusBar().showMessage('Uzupełnij (poprawnie) formularze', 3000)
             return
 
-        from go_exec_fun import change_names
+        from interface.go_exec_fun import change_names
         if change_names(self.folder_name, self.miniature_name_list):
             QMessageBox.information(self, 'Done', 'Zrobione :-)')
             self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
