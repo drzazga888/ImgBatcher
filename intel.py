@@ -58,6 +58,8 @@ class Renamer(Batcher):
     """ klasa, która zmienia nazwy obrazkom
     """
 
+    temp_name = "_IMG_BATCHER_TEMP_"
+
     def __init__(self):
         super().__init__()
         self.transformation_schema = []
@@ -91,6 +93,10 @@ class Renamer(Batcher):
             self.transformation_schema_str += '\n'
 
     def process_single(self, img_name, img_nr):
+        if os.path.isfile(self.transformation_schema[img_nr]['after']):
+            os.rename(os.path.join(self.path, self.transformation_schema[img_nr]['before']),
+                      os.path.join(self.path, self.temp_name))
+            self.transformation_schema[img_nr]['before'] = self.temp_name
         os.rename(os.path.join(self.path, self.transformation_schema[img_nr]['before']),
                   os.path.join(self.path, self.transformation_schema[img_nr]['after']))
 
