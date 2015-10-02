@@ -1,11 +1,17 @@
+from PyQt4 import QtCore
 from PyQt4.QtGui import *
+import time
+from interface import go_exec_fun
+from interface.windows.ProgressWindow import ProgressWindow
+from intel import *
 
 
 class CreateMiniatureWindow(QWidget):
-
     def __init__(self, main, title_font_size, button_size_w, button_size_h, button_font_size, subtitle_font_size):
         super().__init__()
 
+        self.batcher = None
+        self.timer = QtCore.QBasicTimer()
         self.main = main
         self.folder_name = None
         self.folder_dest_name = None
@@ -144,7 +150,7 @@ class CreateMiniatureWindow(QWidget):
         main_layout.addLayout(go_but_layout)
 
         self.setLayout(main_layout)
-        
+
         # podpiecia przyciskow
 
         back_but.clicked.connect(self.back_but_fun)
@@ -179,11 +185,30 @@ class CreateMiniatureWindow(QWidget):
 
         is_sharpen = self.sharpen_rbut.isChecked()
 
-        from interface.go_exec_fun import change_miniature_size
-        if change_miniature_size(width, heigh, quality, self.folder_name, self.folder_dest_name, is_sharpen):
+        self.batcher = go_exec_fun.change_miniature_size(width, heigh, quality, self.folder_name, self.folder_dest_name,
+                                                         is_sharpen)
+
+        self.progressWindow = ProgressWindow(self.main, self.batcher, self.timer, 32, 0, 0, 12, 22)
+        self.main.windows_c.addWidget(self.progressWindow)
+        self.main.windows_c.setCurrentWidget(self.progressWindow)
+
+        self.timer.start(50, self)
+
+        # if result:
+        #     self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
+        #     QMessageBox.information(self, 'Done', 'Zrobione :-)')
+        #     self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
+        # else:
+        #     QMessageBox.information(self, 'Error', 'Błąd :-(\n\njakiś głupi opis błędu makaarena makaarena\n'
+        #                                               'makaarena makaarena makaarena \n'
+        #                                               'makaarena makaarena makaarena ')
+
+    def timerEvent(self, e):
+        if not self.batcher.isAlive():
+            self.timer.stop()
             QMessageBox.information(self, 'Done', 'Zrobione :-)')
             self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
-        else:
-            QMessageBox.information(self, 'Error', 'Błąd :-(\n\njakiś głupi opis błędu makaarena makaarena\n'
-                                                      'makaarena makaarena makaarena \n'
-                                                      'makaarena makaarena makaarena ')
+            self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
+            return
+        self.progressWindow.progress_bar.setValue(self.batcher.processed_images() * 100 / self.batcher.total_images())
+        self.progressWindow.set_proc(self.batcher.processed_images(), self.batcher.total_images())

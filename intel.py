@@ -19,6 +19,7 @@ class Batcher(threading.Thread):
         self.names = []
         self.prop = {}
         self.processed = 0
+        self.close_request = False
 
     def select_dir(self, path):
         self.names = []
@@ -41,6 +42,9 @@ class Batcher(threading.Thread):
 
     def run(self):
         for img_name in self.names:
+            if self.close_request:
+                self.close_request = False
+                return
             self.process_single(img_name, self.processed)
             self.processed += 1
 
@@ -120,3 +124,5 @@ class Resizer(Batcher):
         img.thumbnail(self.prop['size'])
         img.save(os.path.join(self.prop['destination'], img_name_root + '.jpg'), 'JPEG',
                  quality=self.prop['quality'])
+
+#TODO try catch na wybor folderu

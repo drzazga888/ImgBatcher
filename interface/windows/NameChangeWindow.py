@@ -13,7 +13,7 @@ class NameChangeWindow(QWidget):
 
         # deklaracja napisow
 
-        title = QLabel('Zmień nazwy')
+        title = QLabel('Zmiena nazwy')
 
         label_font = title.font()
         label_font.setPointSize(title_font_size)
