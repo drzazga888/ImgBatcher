@@ -19,14 +19,16 @@ class Batcher(threading.Thread):
         self.names = []
         self.prop = {}
         self.processed = 0
+        self.total = 0
         self.close_request = False
 
     def select_dir(self, path):
         self.names = []
         self.path = path
         for f in os.listdir(path):
-            if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(self.extensions):
+            if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(Batcher.extensions):
                 self.names.append(f)
+        self.total = len(self.names)
 
     def load_prop(self, path):
         file = open(path, "r")
@@ -47,15 +49,11 @@ class Batcher(threading.Thread):
                 return
             self.process_single(img_name, self.processed)
             self.processed += 1
+        self.processed = 0
+        self.total = 0
 
     def process_single(self, img_name, img_nr):
         pass
-
-    def processed_images(self):
-        return self.processed
-
-    def total_images(self):
-        return len(self.names)
 
 
 class Renamer(Batcher):
@@ -68,8 +66,6 @@ class Renamer(Batcher):
         super().__init__()
         self.transformation_schema = []
         self.transformation_schema_str = ""
-        self.prop['text'] = 'obrazek_'
-        self.prop['digits'] = 3
 
     def create_transformation_schema(self):
         self.transformation_schema = []
@@ -111,10 +107,6 @@ class Resizer(Batcher):
 
     def __init__(self):
         super().__init__()
-        self.prop['size'] = (256, 256)
-        self.prop['destination'] = '/home/mario/PycharmProjects/ImgBatcher/resized'
-        self.prop['quality'] = 90
-        self.prop['sharpen'] = True
 
     def process_single(self, img_name, img_nr):
         img = Image.open(os.path.join(self.path, img_name))

@@ -1,9 +1,10 @@
 from PyQt4.QtGui import *
 from PyQt4 import QtCore
+import os
+import getpass
 
 
 class NameChangeWindow(QWidget):
-
     def __init__(self, main, title_font_size, button_size_w, button_size_h, button_font_size, subtitle_font_size):
         super().__init__()
 
@@ -95,7 +96,7 @@ class NameChangeWindow(QWidget):
         import_layout = QHBoxLayout()
         import_layout.addWidget(import_but)
         import_layout.addStretch()
-        
+
         sort_layout = QHBoxLayout()
         sort_layout.addWidget(sort_label)
         sort_layout.addWidget(self.sort_type_list)
@@ -187,19 +188,21 @@ class NameChangeWindow(QWidget):
             return
 
         self.miniature_list_model.clear()
-        self.folder_name = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.folder_name = str(QFileDialog.getExistingDirectory(self, "Select Directory",
+                                                                os.path.expanduser(
+                                                                    "~" + getpass.getuser())))
         self.folder_name_label.setText(self.folder_name)
 
-        import os
         i = 0
         for path, subdirs, files in os.walk(self.folder_name):
             for filename in files:
                 extension = os.path.splitext(filename)[1].lower()
                 if extension in {'.jpg', '.tiff', '.png', '.bmp'}:
                     new_file_basename = os.path.basename(new_file_name)
-                    self.miniature_name_list.append((filename, new_file_basename+str(i).zfill(digits_amount)+extension))
+                    self.miniature_name_list.append(
+                        (filename, new_file_basename + str(i).zfill(digits_amount) + extension))
 
-                    item = QStandardItem(self.miniature_name_list[-1][0]+" ---> "+self.miniature_name_list[-1][1])
+                    item = QStandardItem(self.miniature_name_list[-1][0] + " ---> " + self.miniature_name_list[-1][1])
                     self.miniature_list_model.appendRow(item)
                     i += 1
 
@@ -217,5 +220,5 @@ class NameChangeWindow(QWidget):
             self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
         else:
             QMessageBox.information(self, 'Error', 'Błąd :-(\n\njakiś głupi opis błędu makaarena makaarena\n'
-                                                      'makaarena makaarena makaarena \n'
-                                                      'makaarena makaarena makaarena ')
+                                                   'makaarena makaarena makaarena \n'
+                                                   'makaarena makaarena makaarena ')

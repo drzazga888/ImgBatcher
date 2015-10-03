@@ -1,3 +1,4 @@
+import getpass
 from PyQt4 import QtCore
 from PyQt4.QtGui import *
 import time
@@ -164,11 +165,13 @@ class CreateMiniatureWindow(QWidget):
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
 
     def choose_but_fun(self):
-        self.folder_name = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.folder_name = str(QFileDialog.getExistingDirectory(self, "Select Directory", os.path.expanduser(
+                                                                    "~" + getpass.getuser())))
         self.folder_name_label.setText(self.folder_name)
 
     def choose_dest_but_fun(self):
-        self.folder_dest_name = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.folder_dest_name = str(QFileDialog.getExistingDirectory(self, "Select Directory", os.path.expanduser(
+                                                                    "~" + getpass.getuser())))
         self.folder_dest_name_label.setText(self.folder_dest_name)
 
     def go_but_fun(self):
@@ -210,5 +213,5 @@ class CreateMiniatureWindow(QWidget):
             self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
             self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
             return
-        self.progressWindow.progress_bar.setValue(self.batcher.processed_images() * 100 / self.batcher.total_images())
-        self.progressWindow.set_proc(self.batcher.processed_images(), self.batcher.total_images())
+        self.progressWindow.progress_bar.setValue(self.batcher.processed * 100 / self.batcher.total)
+        self.progressWindow.set_proc(self.batcher.processed, self.batcher.total)
