@@ -12,6 +12,7 @@ class Batcher(threading.Thread):
     """ klasa bazowa dla modułów operujących na obrazkach
     """
 
+    wait_time_ms = 50
     extensions = ('jpg', 'jpeg', 'png', 'bmp')
 
     def __init__(self):
@@ -24,6 +25,12 @@ class Batcher(threading.Thread):
         self.close_request = False
 
     def select_dir(self, path):
+        if path == "" or path is None:
+            raise ValueError('Ścieżka katalogu źródłowego nie może być pusta')
+        if not os.path.exists(path):
+            raise ValueError('Katalog źródłowy nie istnieje')
+        if not os.path.isdir(path):
+            raise ValueError('Podana ścieżka katalogu źródłowego nie jest katalogiem')
         self.names = []
         self.path = path
         for f in os.listdir(path):
@@ -58,7 +65,13 @@ class Batcher(threading.Thread):
         self.processed = 0
         self.total = 0
 
+    def set_prop(self, name, value):
+        self.prop[name] = value
+
     def process_single(self, img_name, img_nr):
+        pass
+
+    def validate_prop(self, name, value):
         pass
 
 
@@ -124,6 +137,43 @@ class Resizer(Batcher):
             img = img.crop(cropping_box)
         img.save(os.path.join(self.prop['destination'], img_name_root + '.jpg'), 'JPEG',
                  quality=self.prop['quality'])
+
+    def set_prop(self, name, value):
+        if name == "destination":
+            value = str(value)
+            if value == "" or value is None:
+                raise ValueError('Ścieżka katalogu docelowego nie może być pusta')
+            if not os.path.exists(value):
+                raise ValueError('Katalog docelowy nie istnieje')
+            if not os.path.isdir(value):
+                raise ValueError('Podana ścieżka katalogu docelowego nie jest katalogiem')
+            self.prop[name] = value
+        elif name == "size":
+            if value[0] == "":
+                raise ValueError('Pole "szerokość" musi być wypełnione')
+            if value[1] == "":
+                raise ValueError('Pole "wysokość" musi być wypełnione')
+            if not value[0].isdigit():
+                raise ValueError('Szerokość musi być liczbą całkowitą')
+            if not value[1].isdigit():
+                raise ValueError('Wysokość musi być liczbą całkowitą')
+            value = (int(value[0]), int(value[1]))
+            if not 1 <= value[0] <= 4000:
+                raise ValueError('Szerokość musi być z przedziału od 1 do 4000')
+            if not 1 <= value[1] <= 4000:
+                raise ValueError('Wysokość musi być z przedziału od 1 do 4000')
+            self.prop[name] = value
+        elif name == "quality":
+            if value == "":
+                raise ValueError('Pole "jakość" musi być wypełnione')
+            if not value.isdigit():
+                raise ValueError('Jakość musi być liczbą całkowitą')
+            value = int(value)
+            if not 1 <= value <= 100:
+                raise ValueError('Jakość musi być z przedziału od 1 do 100')
+            self.prop[name] = value
+        else:
+            raise KeyError
 
     # TODO try catch na wybor folderu
 

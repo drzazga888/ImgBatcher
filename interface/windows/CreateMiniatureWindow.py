@@ -11,11 +11,10 @@ class CreateMiniatureWindow(QWidget):
     def __init__(self, main, title_font_size, button_size_w, button_size_h, button_font_size, subtitle_font_size):
         super().__init__()
 
-        self.batcher = None
+        self.batcher = Resizer()
         self.timer = QtCore.QBasicTimer()
+        self.progressWindow = None
         self.main = main
-        self.folder_name = None
-        self.folder_dest_name = None
 
         # deklaracja napisow
 
@@ -32,7 +31,7 @@ class CreateMiniatureWindow(QWidget):
 
         paragraph2 = QLabel('2. Ustaw właściwości')
         width_label = QLabel('Szerokość: ')
-        heigh_label = QLabel('Wysokość: ')
+        height_label = QLabel('Wysokość: ')
         folder_dest_label = QLabel('Folder docelowy: ')
         sharpen_label = QLabel('Wyostrzenie: ')
         quality_label = QLabel('Jakość: ')
@@ -68,14 +67,14 @@ class CreateMiniatureWindow(QWidget):
 
         self.sharpen_rbut = QRadioButton()
 
-        #deklaracja editline'ow
+        # deklaracja editline'ow
 
         self.width_line = QLineEdit()
-        self.heigh_line = QLineEdit()
+        self.height_line = QLineEdit()
         self.quality_line = QLineEdit()
 
         self.width_line.setFixedWidth(50)
-        self.heigh_line.setFixedWidth(50)
+        self.height_line.setFixedWidth(50)
         self.quality_line.setFixedWidth(50)
 
         # layout
@@ -100,16 +99,16 @@ class CreateMiniatureWindow(QWidget):
         width_layout.addWidget(QLabel('px'))
         width_layout.addStretch()
 
-        heigh_layout = QHBoxLayout()
-        heigh_layout.addWidget(heigh_label)
-        heigh_layout.addWidget(self.heigh_line)
-        heigh_layout.addWidget(QLabel('px'))
-        heigh_layout.addStretch()
+        height_layout = QHBoxLayout()
+        height_layout.addWidget(height_label)
+        height_layout.addWidget(self.height_line)
+        height_layout.addWidget(QLabel('px'))
+        height_layout.addStretch()
 
         left_layout = QVBoxLayout()
         left_layout.addLayout(import_layout)
         left_layout.addLayout(width_layout)
-        left_layout.addLayout(heigh_layout)
+        left_layout.addLayout(height_layout)
 
         folder_dest_layout = QHBoxLayout()
         folder_dest_layout.addWidget(folder_dest_label)
@@ -165,46 +164,40 @@ class CreateMiniatureWindow(QWidget):
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
 
     def choose_but_fun(self):
-        self.folder_name = str(QFileDialog.getExistingDirectory(self, "Select Directory", os.path.expanduser(
-                                                                    "~" + getpass.getuser())))
-        self.folder_name_label.setText(self.folder_name)
-
-    def choose_dest_but_fun(self):
-        self.folder_dest_name = str(QFileDialog.getExistingDirectory(self, "Select Directory", os.path.expanduser(
-                                                                    "~" + getpass.getuser())))
-        self.folder_dest_name_label.setText(self.folder_dest_name)
-
-    def go_but_fun(self):
-        # TODO zabezpieczenie na ujemne wartosci
         try:
-            width = int(self.width_line.text())
-            heigh = int(self.heigh_line.text())
-            quality = int(self.quality_line.text())
-            if not self.folder_name or not self.folder_dest_name:
-                raise ValueError()
-        except ValueError:
-            self.main.statusBar().showMessage('Uzupełnij (poprawnie) formularze', 3000)
+            self.batcher.select_dir(
+                QFileDialog.getExistingDirectory(self, "Wybierz folder źródłowy...", self._get_home_dir()))
+            self.folder_name_label.setText(self.batcher.path)
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)
             return
 
-        is_sharpen = self.sharpen_rbut.isChecked()
 
-        self.batcher = go_exec_fun.change_miniature_size(width, heigh, quality, self.folder_name, self.folder_dest_name,
-                                                         is_sharpen)
+    def choose_dest_but_fun(self):
+        self.folder_dest_name_label.setText(
+            QFileDialog.getExistingDirectory(self, "Wybierz folder docelowy...", self._get_home_dir()))
 
-        self.progressWindow = ProgressWindow(self.main, self.batcher, self.timer, 32, 0, 0, 12, 22)
-        self.main.windows_c.addWidget(self.progressWindow)
-        self.main.windows_c.setCurrentWidget(self.progressWindow)
-
-        self.timer.start(50, self)
-
-        # if result:
-        #     self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
-        #     QMessageBox.information(self, 'Done', 'Zrobione :-)')
-        #     self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
-        # else:
-        #     QMessageBox.information(self, 'Error', 'Błąd :-(\n\njakiś głupi opis błędu makaarena makaarena\n'
-        #                                               'makaarena makaarena makaarena \n'
-        #                                               'makaarena makaarena makaarena ')
+    def go_but_fun(self):
+        try:
+            self.batcher.set_prop('size', (self.width_line.text(), self.height_line.text()))
+            self.batcher.set_prop('quality', self.quality_line.text())
+            self.batcher.set_prop('destination', self.folder_dest_name_label.text())
+            self.batcher.start()
+            self.progressWindow = ProgressWindow(self.main, self.batcher, self.timer, 32, 0, 0, 12, 22)
+            self.main.windows_c.addWidget(self.progressWindow)
+            self.main.windows_c.setCurrentWidget(self.progressWindow)
+            self.timer.start(Batcher.wait_time_ms, self)
+            # if result:
+            #     self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
+            #     QMessageBox.information(self, 'Done', 'Zrobione :-)')
+            #     self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
+            # else:
+            #     QMessageBox.information(self, 'Error', 'Błąd :-(\n\njakiś głupi opis błędu makaarena makaarena\n'
+            #                                               'makaarena makaarena makaarena \n'
+            #                                               'makaarena makaarena makaarena ')
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)
+            return
 
     def timerEvent(self, e):
         if not self.batcher.isAlive():
@@ -215,3 +208,7 @@ class CreateMiniatureWindow(QWidget):
             return
         self.progressWindow.progress_bar.setValue(self.batcher.processed * 100 / self.batcher.total)
         self.progressWindow.set_proc(self.batcher.processed, self.batcher.total)
+
+    @staticmethod
+    def _get_home_dir():
+        return os.path.expanduser("~" + getpass.getuser())
