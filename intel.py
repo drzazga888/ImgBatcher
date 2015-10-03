@@ -2,7 +2,8 @@ import json
 import os
 import threading
 
-from PIL import Image, ImageFilter
+from PIL import Image
+import math
 
 __author__ = 'drzazga888'
 
@@ -116,8 +117,29 @@ class Resizer(Batcher):
     def process_single(self, img_name, img_nr):
         img = Image.open(os.path.join(self.path, img_name))
         img_name_root = os.path.splitext(img_name)[0]
-        img.thumbnail(self.prop['size'])
+        covering_size = self._get_covering_size(img.size)
+        img.thumbnail(covering_size, Image.ANTIALIAS)
+        if covering_size != self.prop['size']:
+            cropping_box = self._get_cropping_box(img.size)
+            img = img.crop(cropping_box)
         img.save(os.path.join(self.prop['destination'], img_name_root + '.jpg'), 'JPEG',
                  quality=self.prop['quality'])
 
-#TODO try catch na wybor folderu
+    # TODO try catch na wybor folderu
+
+    def _get_covering_size(self, img_size):
+        asp_w_h = img_size[0] / img_size[1]
+        w_h = self.prop['size']
+        w = w_h[0]
+        h = w_h[1]
+        w_asp = int(math.ceil(h * asp_w_h))
+        h_asp = int(math.ceil(w / asp_w_h))
+        if w_asp > w:
+            return w_asp, h
+        else:
+            return w, h_asp
+
+    def _get_cropping_box(self, img_size):
+        horizontal_pad = int((img_size[0] - self.prop['size'][0]) * 0.5)
+        vertical_pad = int((img_size[1] - self.prop['size'][1]) * 0.5)
+        return horizontal_pad, vertical_pad, img_size[0] - horizontal_pad, img_size[1] - vertical_pad
