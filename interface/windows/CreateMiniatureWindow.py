@@ -152,8 +152,8 @@ class CreateMiniatureWindow(QWidget):
 
         go_but.clicked.connect(self.go_but_fun)
 
+    # info - nie będzie czyszczenia bo tworzony jest zawsze nowy batcher gdy wybierzemy coś z maina
     def back_but_fun(self):
-        # TODO wyczyscic dane przed wykonaniem wstecz
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
 
     def choose_but_fun(self):
@@ -164,7 +164,6 @@ class CreateMiniatureWindow(QWidget):
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
             return
-
 
     def choose_dest_but_fun(self):
         self.folder_dest_name_label.setText(
@@ -199,8 +198,7 @@ class CreateMiniatureWindow(QWidget):
             self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
             self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
             return
-        self.progressWindow.progress_bar.setValue(self.batcher.processed * 100 / self.batcher.total)
-        self.progressWindow.set_proc(self.batcher.processed, self.batcher.total)
+        self.progressWindow.set_progress(self.batcher.processed, self.batcher.total)
 
     @staticmethod
     def _get_home_dir():

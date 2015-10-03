@@ -3,6 +3,9 @@ from PyQt4.QtGui import *
 
 class ProgressWindow(QWidget):
 
+    out_of_delimiter = "/"
+    init_processed_label = '?/?'
+
     def __init__(self, main, batcher, timer, title_font_size, bar_size_w, bar_size_h, button_font_size, subtitle_font_size):
         super().__init__()
 
@@ -25,7 +28,7 @@ class ProgressWindow(QWidget):
         label_font.setPointSize(subtitle_font_size)
         bar_title.setFont(label_font)
 
-        self.proc_img_label = QLabel('')
+        self.proc_img_label = QLabel(self.init_processed_label)
         self.delimiter = '/'
 
         self.proc_img_label.setFixedWidth(40)
@@ -90,5 +93,6 @@ class ProgressWindow(QWidget):
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
 
-    def set_proc(self, proc_img, total_img):
-        self.proc_img_label.setText(str(proc_img)+self.delimiter+str(total_img))
+    def set_progress(self, processed, total):
+        self.progress_bar.setValue(processed * 100 / total)
+        self.proc_img_label.setText(str(processed) + self.out_of_delimiter + str(total))

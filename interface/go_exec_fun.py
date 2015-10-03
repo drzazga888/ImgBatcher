@@ -15,15 +15,3 @@ def change_names(source_folder_name, name_list):
     # batcher.join()
     return None
     # return False  # na blad
-
-
-def change_miniature_size(width, height, quality, source_folder_name, dest_folder_name, is_sharpen):
-    print(width, height, quality, source_folder_name, dest_folder_name, is_sharpen)
-    batcher = Resizer()
-    batcher.select_dir(source_folder_name)
-    batcher.prop['size'] = (width, height)
-    batcher.prop['destination'] = dest_folder_name
-    batcher.prop['quality'] = quality
-    batcher.prop['sharpen'] = is_sharpen
-    batcher.start()
-    return batcher

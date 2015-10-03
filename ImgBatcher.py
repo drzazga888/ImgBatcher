@@ -13,7 +13,7 @@ class Main(QMainWindow):
 
         # ustawienia okna
         # self.setWindowIcon(QIcon('app_ico.png'))  # ustawienie ikonki programu
-        self.setWindowTitle('Window title <Kamil will change this>')  # ustawienie tytulu okna
+        self.setWindowTitle('ImgBatcher')  # ustawienie tytulu okna
         self.resize(800, 600)  # ustawienie domyslnego rozmiaru okna
         self.center()
 

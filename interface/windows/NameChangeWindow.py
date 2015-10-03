@@ -2,6 +2,7 @@ from PyQt4.QtGui import *
 from PyQt4 import QtCore
 import os
 import getpass
+from intel import Renamer
 
 
 class NameChangeWindow(QWidget):
@@ -9,6 +10,7 @@ class NameChangeWindow(QWidget):
         super().__init__()
 
         self.main = main
+        self.batcher = Renamer()
         self.folder_name = None
         self.miniature_name_list = []
 
@@ -68,11 +70,11 @@ class NameChangeWindow(QWidget):
 
         # deklaracja listy rozwijanej
 
-        self.sort_type_list = QComboBox()
-        self.sort_type_list.setEditable(True)
-        self.sort_type_list.addItems(['--- Wybierz opcje ---', 'Nazwa'])
-        self.sort_type_list.setFixedWidth(150)
-        self.sort_type_list.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
+        # self.sort_type_list = QComboBox()
+        # self.sort_type_list.setEditable(True)
+        # self.sort_type_list.addItems(['--- Wybierz opcje ---', 'Nazwa'])
+        # self.sort_type_list.setFixedWidth(150)
+        # self.sort_type_list.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
 
         # deklaracja listy mianiturek
 
@@ -97,14 +99,14 @@ class NameChangeWindow(QWidget):
         import_layout.addWidget(import_but)
         import_layout.addStretch()
 
-        sort_layout = QHBoxLayout()
-        sort_layout.addWidget(sort_label)
-        sort_layout.addWidget(self.sort_type_list)
-        sort_layout.addStretch()
+        # sort_layout = QHBoxLayout()
+        # sort_layout.addWidget(sort_label)
+        # sort_layout.addWidget(self.sort_type_list)
+        # sort_layout.addStretch()
 
         left_layout = QVBoxLayout()
         left_layout.addLayout(import_layout)
-        left_layout.addLayout(sort_layout)
+        # left_layout.addLayout(sort_layout)
 
         text_before_layout = QHBoxLayout()
         text_before_layout.addWidget(text_before_label)
