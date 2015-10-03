@@ -34,7 +34,6 @@ class CreateMiniatureWindow(QWidget):
         height_label = QLabel('Wysokość: ')
         folder_dest_label = QLabel('Folder docelowy: ')
         sharpen_label = QLabel('Wyostrzenie: ')
-        quality_label = QLabel('Jakość: ')
 
         paragraph3 = QLabel('3. Wykonaj')
 
@@ -121,15 +120,9 @@ class CreateMiniatureWindow(QWidget):
         sharpen_layout.addWidget(self.sharpen_rbut)
         sharpen_layout.addStretch()
 
-        quality_layout = QHBoxLayout()
-        quality_layout.addWidget(quality_label)
-        quality_layout.addWidget(self.quality_line)
-        quality_layout.addStretch()
-
         right_layout = QVBoxLayout()
         right_layout.addLayout(folder_dest_layout)
         right_layout.addLayout(sharpen_layout)
-        right_layout.addLayout(quality_layout)
 
         left_right_layout = QHBoxLayout()
         left_right_layout.addLayout(left_layout)
