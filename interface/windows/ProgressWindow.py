@@ -86,8 +86,7 @@ class ProgressWindow(QWidget):
 
     def cancel_but_fun(self):
         self.timer.stop()
-        print(self.batcher)
-        self.batcher.close_request = True
+        self.batcher.stop()
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
 

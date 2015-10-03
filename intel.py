@@ -49,6 +49,11 @@ class Batcher(threading.Thread):
                 return
             self.process_single(img_name, self.processed)
             self.processed += 1
+        self.stop()
+
+    def stop(self):
+        if self.is_alive():
+            self.close_request = True
         self.processed = 0
         self.total = 0
 
@@ -111,8 +116,6 @@ class Resizer(Batcher):
     def process_single(self, img_name, img_nr):
         img = Image.open(os.path.join(self.path, img_name))
         img_name_root = os.path.splitext(img_name)[0]
-        if self.prop['sharpen']:
-            img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=200, threshold=0))
         img.thumbnail(self.prop['size'])
         img.save(os.path.join(self.prop['destination'], img_name_root + '.jpg'), 'JPEG',
                  quality=self.prop['quality'])
