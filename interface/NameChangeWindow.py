@@ -8,10 +8,8 @@ class NameChangeWindow(QWidget):
         super().__init__()
 
         self.main = main
-        self.progressWindow = None
         self.batcher = Renamer()
-        self.folder_name = None
-        self.miniature_name_list = []
+        self.progressWindow = ProgressWindow(self.main, 'Zmiena nazwy', self.batcher, 32, 0, 0, 12, 22)
 
         # deklaracja napisow
 
@@ -143,7 +141,6 @@ class NameChangeWindow(QWidget):
         go_but.clicked.connect(self.go_but_fun)
 
     def back_but_fun(self):
-        # TODO wyczyscic dane przed wykonaniem wstecz
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
 
     def choose_but_fun(self):
@@ -173,7 +170,6 @@ class NameChangeWindow(QWidget):
             self.batcher.set_prop('text', self.text_before_line.text())
             self.batcher.set_prop('digits', self.digits_amount_line.text())
             self.batcher.start()
-            self.progressWindow = ProgressWindow(self.main, self.batcher, 32, 0, 0, 12, 22)
             self.main.windows_c.addWidget(self.progressWindow)
             self.main.windows_c.setCurrentWidget(self.progressWindow)
             self.progressWindow.start()

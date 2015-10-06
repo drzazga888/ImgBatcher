@@ -1,6 +1,7 @@
 from PyQt4 import QtCore
 from PyQt4.QtGui import *
 from intel import Batcher
+from interface.CompleteWindow import CompleteWindow
 
 
 class ProgressWindow(QWidget):
@@ -8,14 +9,13 @@ class ProgressWindow(QWidget):
     out_of_delimiter = "/"
     init_processed_label = '?/?'
 
-    def __init__(self, main, batcher, title_font_size, bar_size_w, bar_size_h, button_font_size, subtitle_font_size):
+    def __init__(self, main, name, batcher, title_font_size, bar_size_w, bar_size_h, button_font_size, subtitle_font_size):
         super().__init__()
 
         self.main = main
         self.batcher = batcher
         self.timer = QtCore.QBasicTimer()
-        self.folder_name = None
-        self.miniature_name_list = []
+        self.completeWindow = CompleteWindow(self.main, name, 32, 200, 100, 18, 18)
 
         # deklaracja napisow
 
@@ -102,9 +102,8 @@ class ProgressWindow(QWidget):
     def timerEvent(self, e):
         if not self.batcher.isRunning():
             self.timer.stop()
-            QMessageBox.information(self, 'Done', 'Zrobione :-)')
-            self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
-            self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
+            self.main.windows_c.addWidget(self.completeWindow)
+            self.main.windows_c.setCurrentWidget(self.completeWindow)
             return
         self.set_progress(self.batcher.processed, self.batcher.total)
 

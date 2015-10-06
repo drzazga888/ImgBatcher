@@ -1,7 +1,4 @@
-import getpass
-
 from PyQt4.QtGui import *
-
 from interface.ProgressWindow import ProgressWindow
 from intel import *
 
@@ -11,8 +8,8 @@ class CreateMiniatureWindow(QWidget):
         super().__init__()
 
         self.batcher = Resizer()
-        self.progressWindow = None
         self.main = main
+        self.progressWindow = ProgressWindow(self.main, 'Stwórz miniatury', self.batcher, 32, 0, 0, 12, 22)
 
         # deklaracja napisow
 
@@ -169,18 +166,9 @@ class CreateMiniatureWindow(QWidget):
             self.batcher.set_prop('quality', self.quality_line.text())
             self.batcher.set_prop('destination', self.folder_dest_name_label.text())
             self.batcher.start()
-            self.progressWindow = ProgressWindow(self.main, self.batcher, 32, 0, 0, 12, 22)
             self.main.windows_c.addWidget(self.progressWindow)
             self.main.windows_c.setCurrentWidget(self.progressWindow)
             self.progressWindow.start()
-            # if result:
-            #     self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
-            #     QMessageBox.information(self, 'Done', 'Zrobione :-)')
-            #     self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
-            # else:
-            #     QMessageBox.information(self, 'Error', 'Błąd :-(\n\njakiś głupi opis błędu makaarena makaarena\n'
-            #                                               'makaarena makaarena makaarena \n'
-            #                                               'makaarena makaarena makaarena ')
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
             return
