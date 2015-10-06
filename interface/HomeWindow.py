@@ -1,6 +1,7 @@
-from interface.windows.NameChangeWindow import NameChangeWindow
-from interface.windows.CreateMiniatureWindow import CreateMiniatureWindow
 from PyQt4.QtGui import *
+
+from interface.NameChangeWindow import NameChangeWindow
+from interface.CreateMiniatureWindow import CreateMiniatureWindow
 
 
 class HomeWindow(QWidget):

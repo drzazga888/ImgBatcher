@@ -1,9 +1,17 @@
-from interface.windows.HomeWindow import HomeWindow
+import getpass
+import os
 
 from PyQt4.QtGui import *
 
+from interface.HomeWindow import HomeWindow
+
 
 class Main(QMainWindow):
+
+    @staticmethod
+    def get_home_dir():
+        return os.path.expanduser("~" + getpass.getuser())
+
     def __init__(self, parent=None):
         super(Main, self).__init__(parent)
 

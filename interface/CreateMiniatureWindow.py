@@ -1,9 +1,8 @@
 import getpass
-from PyQt4 import QtCore
+
 from PyQt4.QtGui import *
-import time
-from interface import go_exec_fun
-from interface.windows.ProgressWindow import ProgressWindow
+
+from interface.ProgressWindow import ProgressWindow
 from intel import *
 
 
@@ -154,15 +153,14 @@ class CreateMiniatureWindow(QWidget):
     def choose_but_fun(self):
         try:
             self.batcher.select_dir(
-                QFileDialog.getExistingDirectory(self, "Wybierz folder źródłowy...", self._get_home_dir()))
+                QFileDialog.getExistingDirectory(self, "Wybierz folder źródłowy...", self.main.get_home_dir()))
             self.folder_name_label.setText(self.batcher.path)
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
-            return
 
     def choose_dest_but_fun(self):
         self.folder_dest_name_label.setText(
-            QFileDialog.getExistingDirectory(self, "Wybierz folder docelowy...", self._get_home_dir()))
+            QFileDialog.getExistingDirectory(self, "Wybierz folder docelowy...", self.main.get_home_dir()))
 
     def go_but_fun(self):
         try:
@@ -185,7 +183,3 @@ class CreateMiniatureWindow(QWidget):
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
             return
-
-    @staticmethod
-    def _get_home_dir():
-        return os.path.expanduser("~" + getpass.getuser())

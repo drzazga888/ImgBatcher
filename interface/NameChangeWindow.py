@@ -3,6 +3,7 @@ from PyQt4 import QtCore
 import os
 import getpass
 from intel import Renamer
+from interface.ProgressWindow import ProgressWindow
 
 
 class NameChangeWindow(QWidget):
@@ -10,6 +11,7 @@ class NameChangeWindow(QWidget):
         super().__init__()
 
         self.main = main
+        self.progressWindow = None
         self.batcher = Renamer()
         self.folder_name = None
         self.miniature_name_list = []
@@ -28,10 +30,8 @@ class NameChangeWindow(QWidget):
         self.folder_dest_name_label = QLabel('')
 
         paragraph2 = QLabel('2. Ustaw właściwości')
-        # sort_label = QLabel('Sortuj wg... ')
         text_before_label = QLabel('Tekst początkowy: ')
         digits_amount_label = QLabel('Ilość cyfr: ')
-        preview_label = QLabel('podgląd')
 
         paragraph3 = QLabel('3. Wykonaj')
 
@@ -47,9 +47,7 @@ class NameChangeWindow(QWidget):
         label_font.setPointSize(subtitle_font_size)
         paragraph3.setFont(label_font)
 
-        label_font = preview_label.font()
         label_font.setPointSize(subtitle_font_size)
-        preview_label.setFont(label_font)
 
         # deklaracja przyciskow
 
@@ -57,6 +55,7 @@ class NameChangeWindow(QWidget):
         choose_but = QPushButton('Wybierz folder...')
         import_but = QPushButton('Import ustawień...')
         go_but = QPushButton('GO!')
+        renaming_preview = QPushButton('Wygeneruj podgląd')
 
         go_but.setFixedSize(button_size_w, button_size_h)
         but_font = go_but.font()
@@ -68,18 +67,10 @@ class NameChangeWindow(QWidget):
         self.text_before_line = QLineEdit()
         self.digits_amount_line = QLineEdit()
 
-        # deklaracja listy rozwijanej
-
-        # self.sort_type_list = QComboBox()
-        # self.sort_type_list.setEditable(True)
-        # self.sort_type_list.addItems(['--- Wybierz opcje ---', 'Nazwa'])
-        # self.sort_type_list.setFixedWidth(150)
-        # self.sort_type_list.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
-
         # deklaracja listy mianiturek
 
         self.miniature_list = QListView()
-        self.miniature_list_model = QStandardItemModel(self.miniature_list)
+        self.miniature_list_model = QStandardItemModel()
         self.miniature_list.setModel(self.miniature_list_model)
         self.miniature_list.setMinimumHeight(100)
 
@@ -99,14 +90,8 @@ class NameChangeWindow(QWidget):
         import_layout.addWidget(import_but)
         import_layout.addStretch()
 
-        # sort_layout = QHBoxLayout()
-        # sort_layout.addWidget(sort_label)
-        # sort_layout.addWidget(self.sort_type_list)
-        # sort_layout.addStretch()
-
         left_layout = QVBoxLayout()
         left_layout.addLayout(import_layout)
-        # left_layout.addLayout(sort_layout)
 
         text_before_layout = QHBoxLayout()
         text_before_layout.addWidget(text_before_label)
@@ -128,7 +113,7 @@ class NameChangeWindow(QWidget):
 
         preview_layout = QHBoxLayout()
         preview_layout.addStretch()
-        preview_layout.addWidget(preview_label)
+        preview_layout.addWidget(renaming_preview)
         preview_layout.addStretch()
 
         go_but_layout = QHBoxLayout()
@@ -156,6 +141,7 @@ class NameChangeWindow(QWidget):
 
         back_but.clicked.connect(self.back_but_fun)
         choose_but.clicked.connect(self.choose_but_fun)
+        renaming_preview.clicked.connect(self.generate_preview)
 
         go_but.clicked.connect(self.go_but_fun)
 
@@ -165,62 +151,25 @@ class NameChangeWindow(QWidget):
 
     def choose_but_fun(self):
         try:
-            new_file_name = self.text_before_line.text()
-            for val in {
-                new_file_name.find('/'),
-                new_file_name.find('\\'),
-                new_file_name.find('?'),
-                new_file_name.find(':'),
-                new_file_name.find('*'),
-                new_file_name.find('"'),
-                new_file_name.find('>'),
-                new_file_name.find('<'),
-                new_file_name.find('|')
-                # \ / ? : * " > < |
-            }:
-                if val != -1:
-                    raise ValueError('Illegal sign in filename!')
+            self.batcher.select_dir(
+                QFileDialog.getExistingDirectory(self, "Wybierz folder źródłowy...", self.main.get_home_dir()))
+            self.folder_name_label.setText(self.batcher.path)
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)
 
-            digits_amount = int(self.digits_amount_line.text())
-
-        except ValueError as valErr:
-            self.main.statusBar().showMessage('Uzupełnij (poprawnie) formularze. ' +
-                                              (str(valErr) if str(valErr) == 'Illegal sign in filename!' else '')
-                                              , 3000)
-            return
-
+    def generate_preview(self):
         self.miniature_list_model.clear()
-        self.folder_name = str(QFileDialog.getExistingDirectory(self, "Select Directory",
-                                                                os.path.expanduser(
-                                                                    "~" + getpass.getuser())))
-        self.folder_name_label.setText(self.folder_name)
-
-        i = 0
-        for path, subdirs, files in os.walk(self.folder_name):
-            for filename in files:
-                extension = os.path.splitext(filename)[1].lower()
-                if extension in {'.jpg', '.tiff', '.png', '.bmp'}:
-                    new_file_basename = os.path.basename(new_file_name)
-                    self.miniature_name_list.append(
-                        (filename, new_file_basename + str(i).zfill(digits_amount) + extension))
-
-                    item = QStandardItem(self.miniature_name_list[-1][0] + " ---> " + self.miniature_name_list[-1][1])
-                    self.miniature_list_model.appendRow(item)
-                    i += 1
+        try:
+            self.batcher.set_prop('text', self.folder_name_label.text())
+            self.batcher.set_prop('digits', self.folder_dest_name_label.text())
+            self.batcher.create_transformation_schema()
+            for entry in self.batcher.transformation_schema_str.split('\n'):
+                print(entry)
+                item = QStandardItem(entry)
+                self.miniature_list_model.appendRow(item)
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)
+            return
 
     def go_but_fun(self):
-        try:
-            if not self.folder_name:
-                raise ValueError()
-        except ValueError:
-            self.main.statusBar().showMessage('Uzupełnij (poprawnie) formularze', 3000)
-            return
-
-        from interface.go_exec_fun import change_names
-        if change_names(self.folder_name, self.miniature_name_list):
-            QMessageBox.information(self, 'Done', 'Zrobione :-)')
-            self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
-        else:
-            QMessageBox.information(self, 'Error', 'Błąd :-(\n\njakiś głupi opis błędu makaarena makaarena\n'
-                                                   'makaarena makaarena makaarena \n'
-                                                   'makaarena makaarena makaarena ')
+        pass
