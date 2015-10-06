@@ -80,6 +80,11 @@ class WatermarkWindow(QWidget):
         watermark_layout.addLayout(watermark_file_layout)
         watermark_layout.addLayout(position_layout)
 
+        choose_watermark_layout = QHBoxLayout()
+        choose_watermark_layout.addLayout(watermark_layout)
+        #choose_watermark_layout.addStretch()
+        choose_watermark_layout.addLayout(choose_layout)
+
         exp_imp_but_layout = QHBoxLayout()
         exp_imp_but_layout.addStretch(2)
         exp_imp_but_layout.addWidget(import_but)
@@ -96,10 +101,7 @@ class WatermarkWindow(QWidget):
         main_layout.addStretch()
         main_layout.addWidget(self.HLine())
         main_layout.addStretch()
-        main_layout.addLayout(choose_source_folder_layout)
-        main_layout.addLayout(choose_dest_folder_layout)
-        main_layout.addLayout(watermark_layout)
-        main_layout.addLayout(position_layout)
+        main_layout.addLayout(choose_watermark_layout)
         main_layout.addStretch()
         main_layout.addWidget(self.HLine())
         main_layout.addStretch()
@@ -108,6 +110,7 @@ class WatermarkWindow(QWidget):
         main_layout.addWidget(self.HLine())
         main_layout.addStretch()
         main_layout.addLayout(go_but_layout)
+        main_layout.addStretch()
 
         self.setLayout(main_layout)
 
