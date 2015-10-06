@@ -20,7 +20,7 @@ class Main(QMainWindow):
         self.setCentralWidget(self.windows_c)
 
         # ustawienia okna
-        # self.setWindowIcon(QIcon('app_ico.png'))  # ustawienie ikonki programu
+        self.setWindowIcon(QIcon('app_ico.png'))  # ustawienie ikonki programu
         self.setWindowTitle('ImgBatcher')  # ustawienie tytulu okna
         self.resize(800, 600)  # ustawienie domyslnego rozmiaru okna
         self.center()
