@@ -164,6 +164,7 @@ class CreateMiniatureWindow(QWidget):
 
     def go_but_fun(self):
         try:
+            self.batcher_check_dir(self.path)
             self.batcher.set_prop('size', (self.width_line.text(), self.height_line.text()))
             self.batcher.set_prop('quality', self.quality_line.text())
             self.batcher.set_prop('destination', self.folder_dest_name_label.text())

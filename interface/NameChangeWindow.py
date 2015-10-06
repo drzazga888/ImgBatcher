@@ -1,7 +1,4 @@
 from PyQt4.QtGui import *
-from PyQt4 import QtCore
-import os
-import getpass
 from intel import Renamer
 from interface.ProgressWindow import ProgressWindow
 
@@ -171,4 +168,15 @@ class NameChangeWindow(QWidget):
             return
 
     def go_but_fun(self):
-        pass
+        try:
+            self.batcher_check_dir(self.path)
+            self.batcher.set_prop('text', self.text_before_line.text())
+            self.batcher.set_prop('digits', int(self.digits_amount_line.text()))
+            self.batcher.start()
+            self.progressWindow = ProgressWindow(self.main, self.batcher, 32, 0, 0, 12, 22)
+            self.main.windows_c.addWidget(self.progressWindow)
+            self.main.windows_c.setCurrentWidget(self.progressWindow)
+            self.progressWindow.start()
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)
+            return

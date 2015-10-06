@@ -100,7 +100,7 @@ class ProgressWindow(QWidget):
         self.proc_img_label.setText(str(processed) + self.out_of_delimiter + str(total))
 
     def timerEvent(self, e):
-        if not self.batcher.isAlive():
+        if not self.batcher.isRunning():
             self.timer.stop()
             QMessageBox.information(self, 'Done', 'Zrobione :-)')
             self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())

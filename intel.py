@@ -1,14 +1,13 @@
+from PyQt4 import QtCore
 import json
 import os
-import threading
-
 from PIL import Image
 import math
 
 __author__ = 'drzazga888'
 
 
-class Batcher(threading.Thread):
+class Batcher(QtCore.QThread):
     """ klasa bazowa dla modułów operujących na obrazkach
     """
 
@@ -25,18 +24,22 @@ class Batcher(threading.Thread):
         self.close_request = False
 
     def select_dir(self, path):
+        self.names = []
+        self._check_dir(path)
+        self.path = path
+        for f in os.listdir(path):
+            if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(Batcher.extensions):
+                self.names.append(f)
+        self.total = len(self.names)
+
+    @staticmethod
+    def _check_dir(path):
         if path == "" or path is None:
             raise ValueError('Ścieżka katalogu źródłowego nie może być pusta')
         if not os.path.exists(path):
             raise ValueError('Katalog źródłowy nie istnieje')
         if not os.path.isdir(path):
             raise ValueError('Podana ścieżka katalogu źródłowego nie jest katalogiem')
-        self.names = []
-        self.path = path
-        for f in os.listdir(path):
-            if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(Batcher.extensions):
-                self.names.append(f)
-        self.total = len(self.names)
 
     def load_prop(self, path):
         file = open(path, "r")
@@ -60,7 +63,7 @@ class Batcher(threading.Thread):
         self.stop()
 
     def stop(self):
-        if self.is_alive():
+        if self.isRunning():
             self.close_request = True
         self.processed = 0
         self.total = 0
@@ -118,6 +121,24 @@ class Renamer(Batcher):
             self.transformation_schema[img_nr]['before'] = self.temp_name
         os.rename(os.path.join(self.path, self.transformation_schema[img_nr]['before']),
                   os.path.join(self.path, self.transformation_schema[img_nr]['after']))
+
+    def set_prop(self, name, value):
+        if name == "text":
+            value = str(value)
+            if value == "" or value is None:
+                raise ValueError('Tekst początkowy nie może być pusty')
+            self.prop[name] = value
+        elif name == "digits":
+            if value == "":
+                raise ValueError('Pole "ilość cyfr" musi być wypełnione')
+            if not value.isdigit():
+                raise ValueError('Ilość cyfr musi być liczbą całkowitą')
+            value = int(value)
+            if not 1 <= value <= 10:
+                raise ValueError('Jakość musi być z przedziału od 1 do 10')
+            self.prop[name] = value
+        else:
+            raise KeyError
 
 
 class Resizer(Batcher):
