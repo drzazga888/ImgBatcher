@@ -49,6 +49,7 @@ class CreateMiniatureWindow(QWidget):
         back_but = QPushButton('wstecz')
         choose_but = QPushButton('Wybierz folder...')
         import_but = QPushButton('Import ustawień...')
+        export_but = QPushButton('Eksport ustawień...')
         choose_dest_but = QPushButton('Wybierz...')
         go_but = QPushButton('GO!')
 
@@ -83,6 +84,10 @@ class CreateMiniatureWindow(QWidget):
         import_layout.addWidget(import_but)
         import_layout.addStretch()
 
+        export_layout = QHBoxLayout()
+        export_layout.addWidget(export_but)
+        export_layout.addStretch()
+
         width_layout = QHBoxLayout()
         width_layout.addWidget(width_label)
         width_layout.addWidget(self.width_line)
@@ -112,6 +117,7 @@ class CreateMiniatureWindow(QWidget):
         quality_layout.addStretch()
 
         right_layout = QVBoxLayout()
+        right_layout.addLayout(export_layout)
         right_layout.addLayout(folder_dest_layout)
         right_layout.addLayout(quality_layout)
 
@@ -140,10 +146,25 @@ class CreateMiniatureWindow(QWidget):
         back_but.clicked.connect(self.back_but_fun)
         choose_but.clicked.connect(self.choose_but_fun)
         choose_dest_but.clicked.connect(self.choose_dest_but_fun)
+        import_but.clicked.connect(self.import_settings)
+        export_but.clicked.connect(self.export_settings)
 
         go_but.clicked.connect(self.go_but_fun)
 
-    # info - nie będzie czyszczenia bo tworzony jest zawsze nowy batcher gdy wybierzemy coś z maina
+    def import_settings(self):
+        prop_path = QFileDialog.getOpenFileName(self, "Wczytaj ustawienia...", self.main.get_home_dir())
+        self.batcher.load_prop(prop_path)
+
+    def export_settings(self):
+        try:
+            self.batcher.set_prop('size', (self.width_line.text(), self.height_line.text()))
+            self.batcher.set_prop('quality', self.quality_line.text())
+            self.batcher.set_prop('destination', self.folder_dest_name_label.text())
+            prop_path = QFileDialog.getSaveFileName(self, "Zapisz ustawienia...", self.main.get_home_dir())
+            self.batcher.save_prop(prop_path)
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)
+
     def back_but_fun(self):
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
 
@@ -171,4 +192,3 @@ class CreateMiniatureWindow(QWidget):
             self.progressWindow.start()
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
-            return

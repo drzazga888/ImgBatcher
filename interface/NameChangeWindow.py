@@ -49,6 +49,7 @@ class NameChangeWindow(QWidget):
         back_but = QPushButton('wstecz')
         choose_but = QPushButton('Wybierz folder...')
         import_but = QPushButton('Import ustawień...')
+        export_but = QPushButton('Export ustawień...')
         go_but = QPushButton('GO!')
         renaming_preview = QPushButton('Wygeneruj podgląd')
 
@@ -85,13 +86,18 @@ class NameChangeWindow(QWidget):
         import_layout.addWidget(import_but)
         import_layout.addStretch()
 
-        left_layout = QVBoxLayout()
-        left_layout.addLayout(import_layout)
+        export_layout = QHBoxLayout()
+        export_layout.addWidget(export_but)
+        export_layout.addStretch()
 
         text_before_layout = QHBoxLayout()
         text_before_layout.addWidget(text_before_label)
         text_before_layout.addWidget(self.text_before_line)
         text_before_layout.addStretch()
+
+        left_layout = QVBoxLayout()
+        left_layout.addLayout(import_layout)
+        left_layout.addLayout(text_before_layout)
 
         digits_amount_layout = QHBoxLayout()
         digits_amount_layout.addWidget(digits_amount_label)
@@ -99,7 +105,7 @@ class NameChangeWindow(QWidget):
         digits_amount_layout.addStretch()
 
         right_layout = QVBoxLayout()
-        right_layout.addLayout(text_before_layout)
+        right_layout.addLayout(export_layout)
         right_layout.addLayout(digits_amount_layout)
 
         left_right_layout = QHBoxLayout()
@@ -162,7 +168,6 @@ class NameChangeWindow(QWidget):
                 self.miniature_list_model.appendRow(item)
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
-            return
 
     def go_but_fun(self):
         try:
@@ -175,4 +180,3 @@ class NameChangeWindow(QWidget):
             self.progressWindow.start()
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
-            return
