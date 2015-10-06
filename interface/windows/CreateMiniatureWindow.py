@@ -12,7 +12,6 @@ class CreateMiniatureWindow(QWidget):
         super().__init__()
 
         self.batcher = Resizer()
-        self.timer = QtCore.QBasicTimer()
         self.progressWindow = None
         self.main = main
 
@@ -33,7 +32,7 @@ class CreateMiniatureWindow(QWidget):
         width_label = QLabel('Szerokość: ')
         height_label = QLabel('Wysokość: ')
         folder_dest_label = QLabel('Folder docelowy: ')
-        sharpen_label = QLabel('Wyostrzenie: ')
+        quality_label = QLabel('Jakość: ')
 
         paragraph3 = QLabel('3. Wykonaj')
 
@@ -61,10 +60,6 @@ class CreateMiniatureWindow(QWidget):
         but_font = go_but.font()
         but_font.setPointSize(button_font_size)
         go_but.setFont(but_font)
-
-        # deklaracja radiobutton'ow
-
-        self.sharpen_rbut = QRadioButton()
 
         # deklaracja editline'ow
 
@@ -115,14 +110,14 @@ class CreateMiniatureWindow(QWidget):
         folder_dest_layout.addWidget(self.folder_dest_name_label)
         folder_dest_layout.addStretch()
 
-        sharpen_layout = QHBoxLayout()
-        sharpen_layout.addWidget(sharpen_label)
-        sharpen_layout.addWidget(self.sharpen_rbut)
-        sharpen_layout.addStretch()
+        quality_layout = QHBoxLayout()
+        quality_layout.addWidget(quality_label)
+        quality_layout.addWidget(self.quality_line)
+        quality_layout.addStretch()
 
         right_layout = QVBoxLayout()
         right_layout.addLayout(folder_dest_layout)
-        right_layout.addLayout(sharpen_layout)
+        right_layout.addLayout(quality_layout)
 
         left_right_layout = QHBoxLayout()
         left_right_layout.addLayout(left_layout)
@@ -175,10 +170,10 @@ class CreateMiniatureWindow(QWidget):
             self.batcher.set_prop('quality', self.quality_line.text())
             self.batcher.set_prop('destination', self.folder_dest_name_label.text())
             self.batcher.start()
-            self.progressWindow = ProgressWindow(self.main, self.batcher, self.timer, 32, 0, 0, 12, 22)
+            self.progressWindow = ProgressWindow(self.main, self.batcher, 32, 0, 0, 12, 22)
             self.main.windows_c.addWidget(self.progressWindow)
             self.main.windows_c.setCurrentWidget(self.progressWindow)
-            self.timer.start(Batcher.wait_time_ms, self)
+            self.progressWindow.start()
             # if result:
             #     self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
             #     QMessageBox.information(self, 'Done', 'Zrobione :-)')
@@ -190,15 +185,6 @@ class CreateMiniatureWindow(QWidget):
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
             return
-
-    def timerEvent(self, e):
-        if not self.batcher.isAlive():
-            self.timer.stop()
-            QMessageBox.information(self, 'Done', 'Zrobione :-)')
-            self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
-            self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
-            return
-        self.progressWindow.set_progress(self.batcher.processed, self.batcher.total)
 
     @staticmethod
     def _get_home_dir():

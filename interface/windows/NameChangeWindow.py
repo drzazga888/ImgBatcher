@@ -28,7 +28,7 @@ class NameChangeWindow(QWidget):
         self.folder_dest_name_label = QLabel('')
 
         paragraph2 = QLabel('2. Ustaw właściwości')
-        sort_label = QLabel('Sortuj wg... ')
+        # sort_label = QLabel('Sortuj wg... ')
         text_before_label = QLabel('Tekst początkowy: ')
         digits_amount_label = QLabel('Ilość cyfr: ')
         preview_label = QLabel('podgląd')

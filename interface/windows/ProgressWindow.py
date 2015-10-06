@@ -1,4 +1,6 @@
+from PyQt4 import QtCore
 from PyQt4.QtGui import *
+from intel import Batcher
 
 
 class ProgressWindow(QWidget):
@@ -6,12 +8,12 @@ class ProgressWindow(QWidget):
     out_of_delimiter = "/"
     init_processed_label = '?/?'
 
-    def __init__(self, main, batcher, timer, title_font_size, bar_size_w, bar_size_h, button_font_size, subtitle_font_size):
+    def __init__(self, main, batcher, title_font_size, bar_size_w, bar_size_h, button_font_size, subtitle_font_size):
         super().__init__()
 
         self.main = main
         self.batcher = batcher
-        self.timer = timer
+        self.timer = QtCore.QBasicTimer()
         self.folder_name = None
         self.miniature_name_list = []
 
@@ -96,3 +98,15 @@ class ProgressWindow(QWidget):
     def set_progress(self, processed, total):
         self.progress_bar.setValue(processed * 100 / total)
         self.proc_img_label.setText(str(processed) + self.out_of_delimiter + str(total))
+
+    def timerEvent(self, e):
+        if not self.batcher.isAlive():
+            self.timer.stop()
+            QMessageBox.information(self, 'Done', 'Zrobione :-)')
+            self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
+            self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
+            return
+        self.set_progress(self.batcher.processed, self.batcher.total)
+
+    def start(self):
+        self.timer.start(Batcher.wait_time_ms, self)
