@@ -196,8 +196,6 @@ class Resizer(Batcher):
         else:
             raise KeyError
 
-    # TODO try catch na wybor folderu
-
     def _get_covering_size(self, img_size):
         asp_w_h = img_size[0] / img_size[1]
         w_h = self.prop['size']

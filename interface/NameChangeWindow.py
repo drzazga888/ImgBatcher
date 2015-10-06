@@ -156,6 +156,8 @@ class NameChangeWindow(QWidget):
             self.folder_name_label.setText(self.batcher.path)
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
+        except FileNotFoundError:
+            self.main.statusBar().showMessage("Błędnie wybrany katalog", 3000)
 
     def generate_preview(self):
         self.miniature_list_model.clear()

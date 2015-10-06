@@ -152,8 +152,13 @@ class CreateMiniatureWindow(QWidget):
         go_but.clicked.connect(self.go_but_fun)
 
     def import_settings(self):
-        prop_path = QFileDialog.getOpenFileName(self, "Wczytaj ustawienia...", self.main.get_home_dir())
-        self.batcher.load_prop(prop_path)
+        try:
+            prop_path = QFileDialog.getOpenFileName(self, "Wczytaj ustawienia...", self.main.get_home_dir())
+            self.batcher.load_prop(prop_path)
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)
+        except FileNotFoundError as err:
+            self.main.statusBar().showMessage("Błędnie wybrany plik", 3000)
 
     def export_settings(self):
         try:
@@ -164,6 +169,8 @@ class CreateMiniatureWindow(QWidget):
             self.batcher.save_prop(prop_path)
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
+        except FileNotFoundError:
+            self.main.statusBar().showMessage("Błędnie wybrany plik", 3000)
 
     def back_but_fun(self):
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
@@ -175,10 +182,15 @@ class CreateMiniatureWindow(QWidget):
             self.folder_name_label.setText(self.batcher.path)
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
+        except FileNotFoundError:
+            self.main.statusBar().showMessage("Błędnie wybrany katalog", 3000)
 
     def choose_dest_but_fun(self):
-        self.folder_dest_name_label.setText(
-            QFileDialog.getExistingDirectory(self, "Wybierz folder docelowy...", self.main.get_home_dir()))
+        try:
+            self.folder_dest_name_label.setText(
+                QFileDialog.getExistingDirectory(self, "Wybierz folder docelowy...", self.main.get_home_dir()))
+        except FileNotFoundError:
+            self.main.statusBar().showMessage("Błędnie wybrany katalog", 3000)
 
     def go_but_fun(self):
         try:
