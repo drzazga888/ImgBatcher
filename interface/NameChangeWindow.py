@@ -160,11 +160,10 @@ class NameChangeWindow(QWidget):
     def generate_preview(self):
         self.miniature_list_model.clear()
         try:
-            self.batcher.set_prop('text', self.folder_name_label.text())
-            self.batcher.set_prop('digits', self.folder_dest_name_label.text())
+            self.batcher.set_prop('text', self.text_before_line.text())
+            self.batcher.set_prop('digits', int(self.digits_amount_line.text()))
             self.batcher.create_transformation_schema()
             for entry in self.batcher.transformation_schema_str.split('\n'):
-                print(entry)
                 item = QStandardItem(entry)
                 self.miniature_list_model.appendRow(item)
         except ValueError as err:
