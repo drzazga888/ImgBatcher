@@ -27,7 +27,7 @@ class Batcher(QtCore.QThread):
         self.names = []
         self.check_dir(path)
         self.path = path
-        for f in os.listdir(path):
+        for f in sorted(os.listdir(path)):
             if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(Batcher.extensions):
                 self.names.append(f)
         self.total = len(self.names)
