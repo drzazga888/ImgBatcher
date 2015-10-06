@@ -158,7 +158,7 @@ class NameChangeWindow(QWidget):
         self.miniature_list_model.clear()
         try:
             self.batcher.set_prop('text', self.text_before_line.text())
-            self.batcher.set_prop('digits', int(self.digits_amount_line.text()))
+            self.batcher.set_prop('digits', self.digits_amount_line.text())
             self.batcher.create_transformation_schema()
             for entry in self.batcher.transformation_schema_str.split('\n'):
                 item = QStandardItem(entry)
@@ -169,9 +169,9 @@ class NameChangeWindow(QWidget):
 
     def go_but_fun(self):
         try:
-            self.batcher_check_dir(self.path)
+            self.batcher.check_dir(self.batcher.path)
             self.batcher.set_prop('text', self.text_before_line.text())
-            self.batcher.set_prop('digits', int(self.digits_amount_line.text()))
+            self.batcher.set_prop('digits', self.digits_amount_line.text())
             self.batcher.start()
             self.progressWindow = ProgressWindow(self.main, self.batcher, 32, 0, 0, 12, 22)
             self.main.windows_c.addWidget(self.progressWindow)

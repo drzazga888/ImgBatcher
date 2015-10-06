@@ -25,7 +25,7 @@ class Batcher(QtCore.QThread):
 
     def select_dir(self, path):
         self.names = []
-        self._check_dir(path)
+        self.check_dir(path)
         self.path = path
         for f in os.listdir(path):
             if os.path.isfile(os.path.join(path, f)) and f.lower().endswith(Batcher.extensions):
@@ -33,7 +33,7 @@ class Batcher(QtCore.QThread):
         self.total = len(self.names)
 
     @staticmethod
-    def _check_dir(path):
+    def check_dir(path):
         if path == "" or path is None:
             raise ValueError('Ścieżka katalogu źródłowego nie może być pusta')
         if not os.path.exists(path):
