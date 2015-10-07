@@ -155,6 +155,10 @@ class CreateMiniatureWindow(QWidget):
         try:
             prop_path = QFileDialog.getOpenFileName(self, "Wczytaj ustawienia...", self.main.get_home_dir())
             self.batcher.load_prop(prop_path)
+            self.width_line.setText(str(self.batcher.prop['size'][0]))
+            self.height_line.setText(str(self.batcher.prop['size'][1]))
+            self.quality_line.setText(str(self.batcher.prop['quality']))
+            self.folder_dest_name_label.setText(str(self.batcher.prop['destination']))
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
         except FileNotFoundError as err:
