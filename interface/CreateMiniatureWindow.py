@@ -161,8 +161,10 @@ class CreateMiniatureWindow(QWidget):
             self.folder_dest_name_label.setText(str(self.batcher.prop['destination']))
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
-        except FileNotFoundError as err:
+        except FileNotFoundError:
             self.main.statusBar().showMessage("Błędnie wybrany plik", 3000)
+        except NameError:
+            self.main.statusBar().showMessage("Wczytano nieodpowiedni plik", 3000)
 
     def export_settings(self):
         try:

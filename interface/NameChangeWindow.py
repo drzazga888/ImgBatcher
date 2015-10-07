@@ -143,8 +143,34 @@ class NameChangeWindow(QWidget):
         back_but.clicked.connect(self.back_but_fun)
         choose_but.clicked.connect(self.choose_but_fun)
         renaming_preview.clicked.connect(self.generate_preview)
+        import_but.clicked.connect(self.import_settings)
+        export_but.clicked.connect(self.export_settings)
 
         go_but.clicked.connect(self.go_but_fun)
+
+    def import_settings(self):
+        try:
+            prop_path = QFileDialog.getOpenFileName(self, "Wczytaj ustawienia...", self.main.get_home_dir())
+            self.batcher.load_prop(prop_path)
+            self.text_before_line.setText(str(self.batcher.prop['text']))
+            self.digits_amount_line.setText(str(self.batcher.prop['digits']))
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)
+        except FileNotFoundError:
+            self.main.statusBar().showMessage("Błędnie wybrany plik", 3000)
+        except NameError:
+            self.main.statusBar().showMessage("Wczytano nieodpowiedni plik", 3000)
+
+    def export_settings(self):
+        try:
+            self.batcher.set_prop('text', self.text_before_line.text())
+            self.batcher.set_prop('digits', self.digits_amount_line.text())
+            prop_path = QFileDialog.getSaveFileName(self, "Zapisz ustawienia...", self.main.get_home_dir())
+            self.batcher.save_prop(prop_path)
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)
+        except FileNotFoundError:
+            self.main.statusBar().showMessage("Błędnie wybrany plik", 3000)
 
     def back_but_fun(self):
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())

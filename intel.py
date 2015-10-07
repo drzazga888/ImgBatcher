@@ -44,12 +44,18 @@ class Batcher(QtCore.QThread):
     def load_prop(self, path):
         file = open(path, "r")
         prop_encoded = file.read()
-        self.prop = json.loads(prop_encoded)
         file.close()
+        data_to_load = json.loads(prop_encoded)
+        if data_to_load['name'] != self.__class__.__name__:
+            raise NameError
+        data_to_load.pop('name', None)
+        self.prop = data_to_load
 
     def save_prop(self, path):
         file = open(path, "w")
-        prop_encoded = json.dumps(self.prop)
+        data_to_save = self.prop
+        data_to_save['name'] = self.__class__.__name__
+        prop_encoded = json.dumps(data_to_save)
         file.write(prop_encoded)
         file.close()
 
