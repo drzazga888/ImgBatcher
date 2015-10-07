@@ -236,20 +236,45 @@ class Watermarker(Batcher):
         img = Image.open(os.path.join(self.path, img_name))
         img.load()
         img_name_root = os.path.splitext(img_name)[0]
-        print(img.mode)
         img.paste(self.watermark, box=self._get_pasting_box(img.size, self.watermark.size),
                   mask=self.watermark.split()[3])
         img.save(os.path.join(self.prop['destination'], img_name_root + '.jpg'), 'JPEG',
                  quality=self.prop['quality'])
 
     def set_prop(self, name, value):
-        if name == "pasting_corner" and value not in ['top-left', 'top-right', 'bottom-right', 'bottom-left']:
-            raise ValueError("Zła wartość położenia znaku wodnego")
-        if name in ["watermark_source", "destination", "pasting_corner"]:
+        if name == "pasting_corner":
+            if value not in ['top-left', 'top-right', 'bottom-right', 'bottom-left']:
+                raise ValueError("Zła wartość położenia znaku wodnego")
+            self.prop[name] = value
+        elif name == "destination":
+            value = str(value)
+            if value == "" or value is None:
+                raise ValueError('Ścieżka katalogu docelowego nie może być pusta')
+            if not os.path.exists(value):
+                raise ValueError('Katalog docelowy nie istnieje')
+            if not os.path.isdir(value):
+                raise ValueError('Podana ścieżka katalogu docelowego nie jest katalogiem')
+            self.prop[name] = value
+        elif name == "watermark_source":
+            value = str(value)
+            if value == "" or value is None:
+                raise ValueError('Ścieżka do znaku wodnego nie może być pusta')
+            if not os.path.exists(value):
+                raise ValueError('Znak wodny nie istnieje')
+            if os.path.isdir(value):
+                raise ValueError('Podana ścieżka znaku wodnego nie może być katalogiem')
             self.prop[name] = value
         elif name == "quality":
-            self.prop[name] = int(value)
+            if value == "":
+                raise ValueError('Pole "jakość" musi być wypełnione')
+            if not value.isdigit():
+                raise ValueError('Jakość musi być liczbą całkowitą')
+            value = int(value)
+            if not 1 <= value <= 100:
+                raise ValueError('Jakość musi być z przedziału od 1 do 100')
+            self.prop[name] = value
         else:
+            print(name, value)
             raise KeyError
 
     def _get_pasting_box(self, img_size, watermark_size):
