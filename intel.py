@@ -234,8 +234,11 @@ class Watermarker(Batcher):
 
     def process_single(self, img_name, img_nr):
         img = Image.open(os.path.join(self.path, img_name))
+        img.load()
         img_name_root = os.path.splitext(img_name)[0]
-        img.paste(self.watermark, box=self._get_pasting_box(img.size, self.watermark.size))
+        print(img.mode)
+        img.paste(self.watermark, box=self._get_pasting_box(img.size, self.watermark.size),
+                  mask=self.watermark.split()[3])
         img.save(os.path.join(self.prop['destination'], img_name_root + '.jpg'), 'JPEG',
                  quality=self.prop['quality'])
 
