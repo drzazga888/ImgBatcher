@@ -12,6 +12,13 @@ class Main(QMainWindow):
     def get_home_dir():
         return os.path.expanduser("~" + getpass.getuser())
 
+    @staticmethod
+    def h_line():
+        toto = QFrame()
+        toto.setFrameShape(QFrame.HLine)
+        toto.setFrameShadow(QFrame.Sunken)
+        return toto
+
     def __init__(self, parent=None):
         super(Main, self).__init__(parent)
 

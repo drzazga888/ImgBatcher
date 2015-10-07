@@ -218,3 +218,43 @@ class Resizer(Batcher):
         horizontal_pad = int((img_size[0] - self.prop['size'][0]) * 0.5)
         vertical_pad = int((img_size[1] - self.prop['size'][1]) * 0.5)
         return horizontal_pad, vertical_pad, img_size[0] - horizontal_pad, img_size[1] - vertical_pad
+
+
+class Watermarker(Batcher):
+    """ klasa tworzy znaki wodne
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.watermark = None
+
+    def run(self):
+        super().run()
+        self.watermark = Image.open(self.prop['watermark_source'])
+
+    def process_single(self, img_name, img_nr):
+        img = Image.open(os.path.join(self.path, img_name))
+        img_name_root = os.path.splitext(img_name)[0]
+        img.paste(self.watermark, box=self._get_pasting_box(img.size, self.watermark.size))
+        img.save(os.path.join(self.prop['destination'], img_name_root + '.jpg'), 'JPEG',
+                 quality=self.prop['quality'])
+
+    def set_prop(self, name, value):
+        if name == "pasting-corner" and value not in ['top-left', 'top-right', 'bottom-right', 'bottom-left']:
+            raise ValueError("Zła wartość położenia znaku wodnego")
+        if name in ["watermark_source", "destination", "pasting-corner"]:
+            self.prop[name] = value
+        elif name == "quality":
+            self.prop[name] = int(value)
+        else:
+            raise KeyError
+
+    def _get_pasting_box(self, img_size, watermark_size):
+        if self.prop['pasting_corner'] == 'top-left':
+            return 0, 0
+        elif self.prop['pasting_corner'] == 'top-right':
+            return 0, img_size[1] - watermark_size[1]
+        elif self.prop['pasting_corner'] == 'bottom-right':
+            return img_size[0] - watermark_size[0], img_size[1] - watermark_size[1]
+        elif self.prop['pasting_corner'] == 'bottom-left':
+            return img_size[0] - watermark_size[0], 0

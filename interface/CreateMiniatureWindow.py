@@ -20,29 +20,14 @@ class CreateMiniatureWindow(QWidget):
         label_font.setBold(True)
         title.setFont(label_font)
 
-        paragraph1 = QLabel('1. Wskaż folder z obrazkami')
         self.folder_name_label = QLabel('')
         self.folder_dest_name_label = QLabel('')
 
-        paragraph2 = QLabel('2. Ustaw właściwości')
         width_label = QLabel('Szerokość: ')
         height_label = QLabel('Wysokość: ')
         folder_dest_label = QLabel('Folder docelowy: ')
         quality_label = QLabel('Jakość: ')
 
-        paragraph3 = QLabel('3. Wykonaj')
-
-        label_font = paragraph1.font()
-        label_font.setPointSize(subtitle_font_size)
-        paragraph1.setFont(label_font)
-
-        label_font = paragraph2.font()
-        label_font.setPointSize(subtitle_font_size)
-        paragraph2.setFont(label_font)
-
-        label_font = paragraph3.font()
-        label_font.setPointSize(subtitle_font_size)
-        paragraph3.setFont(label_font)
 
         # deklaracja przyciskow
 
@@ -132,11 +117,11 @@ class CreateMiniatureWindow(QWidget):
 
         main_layout = QVBoxLayout()
         main_layout.addLayout(title_layout)
-        main_layout.addWidget(paragraph1)
+        main_layout.addWidget(self.main.h_line())
         main_layout.addLayout(choose_folder_layout)
-        main_layout.addWidget(paragraph2)
+        main_layout.addWidget(self.main.h_line())
         main_layout.addLayout(left_right_layout)
-        main_layout.addWidget(paragraph3)
+        main_layout.addWidget(self.main.h_line())
         main_layout.addLayout(go_but_layout)
 
         self.setLayout(main_layout)
