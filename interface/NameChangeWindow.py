@@ -9,7 +9,7 @@ class NameChangeWindow(QWidget):
 
         self.main = main
         self.batcher = Renamer()
-        self.progressWindow = ProgressWindow(self.main, 'Zmiena nazwy', self.batcher, 32, 0, 0, 12, 22)
+        self.progressWindow = ProgressWindow(self.main, 'Zmiana nazwy', self.batcher, 32, 0, 0, 12, 22)
 
         # deklaracja napisow
 

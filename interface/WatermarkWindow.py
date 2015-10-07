@@ -1,6 +1,6 @@
-from PyQt4 import QtCore
 from PyQt4.QtGui import *
 from intel import Watermarker
+from interface.ProgressWindow import ProgressWindow
 
 
 class WatermarkWindow(QWidget):
@@ -9,6 +9,7 @@ class WatermarkWindow(QWidget):
 
         self.main = main
         self.batcher = Watermarker()
+        self.progressWindow = ProgressWindow(self.main, 'Dodawanie znaku wodnego', self.batcher, 32, 0, 0, 12, 22)
 
         # deklaracja napisow
 
@@ -27,6 +28,7 @@ class WatermarkWindow(QWidget):
 
         self.source_path_label = QLabel('')
         self.dest_path_label = QLabel('')
+        self.watermark_path_label = QLabel('')
 
         # deklaracja przyciskow
 
@@ -46,10 +48,12 @@ class WatermarkWindow(QWidget):
         #drop-down list
 
         self.position_list = QComboBox()
-        self.position_list.setEditable(True)
-        self.position_list.addItems(['--- Wybierz opcje ---', 'prawa, góra', 'prawa, dół', 'lewa, dół', 'lewa góra'])
+        self.position_list.addItem('--- Wybierz opcje ---', '')
+        self.position_list.addItem('lewa góra', 'top-left')
+        self.position_list.addItem('prawa góra', 'top-right')
+        self.position_list.addItem('prawy dół', 'bottom-right')
+        self.position_list.addItem('lewy dół', 'bottom-left')
         self.position_list.setFixedWidth(150)
-        self.position_list.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
 
         #edit-liny
         self.quality_line = QLineEdit()
@@ -85,6 +89,7 @@ class WatermarkWindow(QWidget):
         watermark_file_layout = QHBoxLayout()
         watermark_file_layout.addWidget(watermark_label)
         watermark_file_layout.addWidget(choose_watermark)
+        watermark_file_layout.addWidget(self.watermark_path_label)
         watermark_file_layout.addStretch()
 
         position_layout = QHBoxLayout()
@@ -99,7 +104,6 @@ class WatermarkWindow(QWidget):
 
         choose_watermark_layout = QHBoxLayout()
         choose_watermark_layout.addLayout(watermark_layout)
-        #choose_watermark_layout.addStretch()
         choose_watermark_layout.addLayout(choose_layout)
 
         exp_imp_but_layout = QHBoxLayout()
@@ -115,7 +119,6 @@ class WatermarkWindow(QWidget):
 
         main_layout = QVBoxLayout()
         main_layout.addLayout(title_layout)
-        main_layout.addStretch()
         main_layout.addWidget(self.main.h_line())
         main_layout.addStretch()
         main_layout.addLayout(choose_watermark_layout)
@@ -133,23 +136,32 @@ class WatermarkWindow(QWidget):
 
         # podpiecia przyciskow
 
+        choose_watermark.clicked.connect(self.choose_watermark_but_fun)
         back_but.clicked.connect(self.back_but_fun)
         choose_source_but.clicked.connect(self.choose_but_fun)
         choose_dest_but.clicked.connect(self.choose_dest_but_fun)
         import_but.clicked.connect(self.import_settings)
         export_but.clicked.connect(self.export_settings)
 
+        go_but.clicked.connect(self.go_but_fun)
+
     def back_but_fun(self):
         self.main.windows_c.removeWidget(self.main.windows_c.currentWidget())
+
+    @staticmethod
+    def set_combobox(combobox, user_data):
+        for index in range(combobox.count()):
+            if combobox.itemData(index) == user_data:
+                combobox.setCurrentIndex(index)
 
     def import_settings(self):
         try:
             prop_path = QFileDialog.getOpenFileName(self, "Wczytaj ustawienia...", self.main.get_home_dir())
             self.batcher.load_prop(prop_path)
-            self.width_line.setText(str(self.batcher.prop['size'][0]))
-            self.height_line.setText(str(self.batcher.prop['size'][1]))
+            self.watermark_path_label.setText(str(self.batcher.prop['watermark_source']))
             self.quality_line.setText(str(self.batcher.prop['quality']))
-            self.folder_dest_name_label.setText(str(self.batcher.prop['destination']))
+            self.dest_path_label.setText(str(self.batcher.prop['destination']))
+            self.set_combobox(self.position_list, self.batcher.prop['pasting_corner'])
         except ValueError as err:
             self.main.statusBar().showMessage(str(err), 3000)
         except FileNotFoundError:
@@ -159,9 +171,10 @@ class WatermarkWindow(QWidget):
 
     def export_settings(self):
         try:
-            self.batcher.set_prop('size', (self.width_line.text(), self.height_line.text()))
+            self.batcher.set_prop('watermark_source', self.watermark_path_label.text())
             self.batcher.set_prop('quality', self.quality_line.text())
-            self.batcher.set_prop('destination', self.folder_dest_name_label.text())
+            self.batcher.set_prop('destination', self.dest_path_label.text())
+            self.batcher.set_prop('pasting_corner', str(self.position_list.itemData(self.position_list.currentIndex())))
             prop_path = QFileDialog.getSaveFileName(self, "Zapisz ustawienia...", self.main.get_home_dir())
             self.batcher.save_prop(prop_path)
         except ValueError as err:
@@ -185,3 +198,24 @@ class WatermarkWindow(QWidget):
                 QFileDialog.getExistingDirectory(self, "Wybierz folder docelowy...", self.main.get_home_dir()))
         except FileNotFoundError:
             self.main.statusBar().showMessage("Błędnie wybrany katalog", 3000)
+
+    def choose_watermark_but_fun(self):
+        try:
+            self.watermark_path_label.setText(
+                QFileDialog.getOpenFileName(self, "Wybierz znak wodny...", self.main.get_home_dir()))
+        except FileNotFoundError:
+            self.main.statusBar().showMessage("Błędnie wybrany katalog", 3000)
+
+    def go_but_fun(self):
+        try:
+            self.batcher.check_dir(self.batcher.path)
+            self.batcher.set_prop('watermark_source', self.watermark_path_label.text())
+            self.batcher.set_prop('quality', self.quality_line.text())
+            self.batcher.set_prop('destination', self.dest_path_label.text())
+            self.batcher.set_prop('pasting_corner', str(self.position_list.itemData(self.position_list.currentIndex())))
+            self.batcher.start()
+            self.main.windows_c.addWidget(self.progressWindow)
+            self.main.windows_c.setCurrentWidget(self.progressWindow)
+            self.progressWindow.start()
+        except ValueError as err:
+            self.main.statusBar().showMessage(str(err), 3000)

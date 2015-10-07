@@ -229,8 +229,8 @@ class Watermarker(Batcher):
         self.watermark = None
 
     def run(self):
-        super().run()
         self.watermark = Image.open(self.prop['watermark_source'])
+        super().run()
 
     def process_single(self, img_name, img_nr):
         img = Image.open(os.path.join(self.path, img_name))
@@ -240,9 +240,9 @@ class Watermarker(Batcher):
                  quality=self.prop['quality'])
 
     def set_prop(self, name, value):
-        if name == "pasting-corner" and value not in ['top-left', 'top-right', 'bottom-right', 'bottom-left']:
+        if name == "pasting_corner" and value not in ['top-left', 'top-right', 'bottom-right', 'bottom-left']:
             raise ValueError("Zła wartość położenia znaku wodnego")
-        if name in ["watermark_source", "destination", "pasting-corner"]:
+        if name in ["watermark_source", "destination", "pasting_corner"]:
             self.prop[name] = value
         elif name == "quality":
             self.prop[name] = int(value)
