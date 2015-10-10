@@ -1,4 +1,5 @@
-from PyQt4.QtGui import *
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtWidgets import *
 from intel import Renamer
 from interface.ProgressWindow import ProgressWindow
 

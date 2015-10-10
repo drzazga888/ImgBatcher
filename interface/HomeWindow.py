@@ -1,4 +1,4 @@
-from PyQt4.QtGui import *
+from PyQt5.QtWidgets import *
 
 from interface.NameChangeWindow import NameChangeWindow
 from interface.CreateMiniatureWindow import CreateMiniatureWindow

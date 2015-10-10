@@ -1,4 +1,4 @@
-from PyQt4.QtGui import *
+from PyQt5.QtWidgets import *
 from intel import Watermarker
 from interface.ProgressWindow import ProgressWindow
 

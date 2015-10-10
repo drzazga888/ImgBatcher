@@ -1,8 +1,7 @@
 import getpass
 import os
-
-from PyQt4.QtGui import *
-
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import *
 from interface.HomeWindow import HomeWindow
 
 
